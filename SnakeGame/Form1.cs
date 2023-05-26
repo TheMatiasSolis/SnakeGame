@@ -172,9 +172,6 @@ namespace SnakeGame
             }
         }
 
-
-
-
         private void EndGame()
         {
             gameTimer.Stop();
