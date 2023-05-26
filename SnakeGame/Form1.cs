@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace SnakeGame
 {
@@ -179,14 +180,39 @@ namespace SnakeGame
             gameTimer.Stop();
             MessageBox.Show("Game Over", "Snake Game", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            if (score > highScore)
-            {
-                // Si el puntaje actual es mayor que el high score, actualizar el high score
-                highScore = score;
+            string highScoreText = string.Empty;
+            string lastScoreText = "LastScore = " + score.ToString();
 
-                // Guardar el high score en el archivo
-                File.WriteAllText("SnakeHighScore.txt", "HighScore = "+ highScore.ToString());
+            // Verificar si existe un high score previo
+            if (File.Exists("SnakeHighScore.txt"))
+            {
+                // Leer el contenido actual del archivo
+                string fileContent = File.ReadAllText("SnakeHighScore.txt");
+
+                // Buscar el high score en el contenido actual
+                Match highScoreMatch = Regex.Match(fileContent, @"HighScore\s*=\s*(\d+)");
+
+                if (highScoreMatch.Success)
+                {
+                    int savedHighScore = int.Parse(highScoreMatch.Groups[1].Value);
+
+                    // Verificar si el puntaje actual supera el high score
+                    if (score > savedHighScore)
+                    {
+                        // Actualizar el high score
+                        highScoreText = "HighScore = " + score.ToString();
+                    }
+                    else
+                    {
+                        // Mantener el high score actual
+                        highScoreText = highScoreMatch.Value;
+                    }
+                }
             }
+
+            // Guardar el high score y el último puntaje en el archivo
+            string fileContentToUpdate = highScoreText + Environment.NewLine + lastScoreText;
+            File.WriteAllText("SnakeHighScore.txt", fileContentToUpdate);
 
             // Reiniciar el puntaje a cero
             score = 0;
@@ -194,6 +220,8 @@ namespace SnakeGame
 
             InitializeGame();
         }
+
+
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {

@@ -1,1 +1,2 @@
-HighScore = 9
+HighScore = 1
+LastScore = 0
